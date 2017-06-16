@@ -1,0 +1,1359 @@
+*** Starting uWSGI 2.0.14 (64bit) on [Sun Mar 19 21:10:53 2017] ***
+compiled with version: 4.8.4 on 27 October 2016 14:27:44
+os: Linux-4.2.0-27-generic #32~14.04.1-Ubuntu SMP Fri Jan 22 15:32:26 UTC 2016
+nodename: cbsr-wj-server
+machine: x86_64
+clock source: unix
+pcre jit disabled
+detected number of CPU cores: 12
+current working directory: /data4/jiali/hand/testing
+detected binary path: /usr/local/bin/uwsgi
+chdir() to /data4/jiali/hand/testing/
+*** WARNING: you are running uWSGI without its master process manager ***
+your processes number limit is 256300
+your memory page size is 4096 bytes
+detected max file descriptor number: 1024
+lock engine: pthread robust mutexes
+thunder lock: disabled (you can enable it with --thunder-lock)
+uwsgi socket 0 bound to UNIX address /data4/jiali/hand/testing/handPose_recog.sock fd 3
+Python version: 2.7.6 (default, Jun 22 2015, 18:01:27)  [GCC 4.8.2]
+*** Python threads support is disabled. You can enable it with --enable-threads ***
+Python main interpreter initialized at 0x1054540
+your server socket listen backlog is limited to 100 connections
+your mercy for graceful operations on workers is 60 seconds
+mapped 72768 bytes (71 KB) for 1 cores
+*** Operational MODE: single process ***
+mounting demo_server.py on /handPose_recog
+pycaffe_root ~/caffe/python/pycaffe
+
+NYU_path /data2/duanjiali/NYU/
+WARNING: Logging before InitGoogleLogging() is written to STDERR
+W0319 21:10:54.031709 21384 _caffe.cpp:122] DEPRECATION WARNING - deprecated use of Python interface
+W0319 21:10:54.031745 21384 _caffe.cpp:123] Use this instead (with the named "weights" parameter):
+W0319 21:10:54.031750 21384 _caffe.cpp:125] Net('DeepModel_deploy.prototxt', 1, weights='weights/NYU.caffemodel')
+I0319 21:10:54.033246 21384 upgrade_proto.cpp:67] Attempting to upgrade input file specified using deprecated input fields: DeepModel_deploy.prototxt
+I0319 21:10:54.033267 21384 upgrade_proto.cpp:70] Successfully upgraded file specified using deprecated input fields.
+W0319 21:10:54.033272 21384 upgrade_proto.cpp:72] Note that future Caffe releases will only support input layers and not input fields.
+I0319 21:10:54.519637 21384 net.cpp:58] Initializing net from parameters: 
+name: "DeepModel"
+state {
+  phase: TEST
+  level: 0
+}
+layer {
+  name: "input"
+  type: "Input"
+  top: "data"
+  input_param {
+    shape {
+      dim: 1
+      dim: 1
+      dim: 128
+      dim: 128
+    }
+  }
+}
+layer {
+  name: "convL1"
+  type: "Convolution"
+  bottom: "data"
+  top: "convL1"
+  convolution_param {
+    num_output: 8
+    kernel_size: 5
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "ReLUconvL1"
+  type: "ReLU"
+  bottom: "convL1"
+  top: "convL1"
+}
+layer {
+  name: "poolL1"
+  type: "Pooling"
+  bottom: "convL1"
+  top: "poolL1"
+  pooling_param {
+    pool: MAX
+    kernel_size: 4
+    stride: 4
+  }
+}
+layer {
+  name: "convL2"
+  type: "Convolution"
+  bottom: "poolL1"
+  top: "convL2"
+  convolution_param {
+    num_output: 8
+    kernel_size: 5
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "ReLUconvL2"
+  type: "ReLU"
+  bottom: "convL2"
+  top: "convL2"
+}
+layer {
+  name: "poolL2"
+  type: "Pooling"
+  bottom: "convL2"
+  top: "poolL2"
+  pooling_param {
+    pool: MAX
+    kernel_size: 2
+    stride: 2
+  }
+}
+layer {
+  name: "convL3"
+  type: "Convolution"
+  bottom: "poolL2"
+  top: "convL3"
+  convolution_param {
+    num_output: 8
+    kernel_size: 3
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "ReLUconvL3"
+  type: "ReLU"
+  bottom: "convL3"
+  top: "convL3"
+}
+layer {
+  name: "FC1"
+  type: "InnerProduct"
+  bottom: "convL3"
+  top: "FC1"
+  param {
+    lr_mult: 1
+  }
+  inner_product_param {
+    num_output: 1024
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "ReLUFC1"
+  type: "ReLU"
+  bottom: "FC1"
+  top: "FC1"
+}
+layer {
+  name: "DropoutFC1"
+  type: "Dropout"
+  bottom: "FC1"
+  top: "FC1"
+  dropout_param {
+    dropout_ratio: 0.3
+  }
+}
+layer {
+  name: "FC2"
+  type: "InnerProduct"
+  bottom: "FC1"
+  top: "FC2"
+  param {
+    lr_mult: 1
+  }
+  inner_product_param {
+    num_output: 1024
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "ReLUFC2"
+  type: "ReLU"
+  bottom: "FC2"
+  top: "FC2"
+}
+layer {
+  name: "DropoutFC2"
+  type: "Dropout"
+  bottom: "FC2"
+  top: "FC2"
+  dropout_param {
+    dropout_ratio: 0.3
+  }
+}
+layer {
+  name: "DoF"
+  type: "InnerProduct"
+  bottom: "FC2"
+  top: "DoF"
+  param {
+    lr_mult: 1
+  }
+  inner_product_param {
+    num_output: 47
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "DeepHandModel"
+  type: "DeepHandModel"
+  bottom: "DoF"
+  top: "pred"
+}
+I0319 21:10:54.519727 21384 layer_factory.hpp:77] Creating layer input
+I0319 21:10:54.519742 21384 net.cpp:100] Creating Layer input
+I0319 21:10:54.519748 21384 net.cpp:408] input -> data
+I0319 21:10:54.519767 21384 net.cpp:150] Setting up input
+I0319 21:10:54.519775 21384 net.cpp:157] Top shape: 1 1 128 128 (16384)
+I0319 21:10:54.519778 21384 net.cpp:165] Memory required for data: 65536
+I0319 21:10:54.519783 21384 layer_factory.hpp:77] Creating layer convL1
+I0319 21:10:54.519791 21384 net.cpp:100] Creating Layer convL1
+I0319 21:10:54.519796 21384 net.cpp:434] convL1 <- data
+I0319 21:10:54.519801 21384 net.cpp:408] convL1 -> convL1
+I0319 21:10:54.520141 21384 net.cpp:150] Setting up convL1
+I0319 21:10:54.520153 21384 net.cpp:157] Top shape: 1 8 124 124 (123008)
+I0319 21:10:54.520156 21384 net.cpp:165] Memory required for data: 557568
+I0319 21:10:54.520165 21384 layer_factory.hpp:77] Creating layer ReLUconvL1
+I0319 21:10:54.520174 21384 net.cpp:100] Creating Layer ReLUconvL1
+I0319 21:10:54.520177 21384 net.cpp:434] ReLUconvL1 <- convL1
+I0319 21:10:54.520182 21384 net.cpp:395] ReLUconvL1 -> convL1 (in-place)
+I0319 21:10:54.520189 21384 net.cpp:150] Setting up ReLUconvL1
+I0319 21:10:54.520192 21384 net.cpp:157] Top shape: 1 8 124 124 (123008)
+I0319 21:10:54.520195 21384 net.cpp:165] Memory required for data: 1049600
+I0319 21:10:54.520200 21384 layer_factory.hpp:77] Creating layer poolL1
+I0319 21:10:54.520205 21384 net.cpp:100] Creating Layer poolL1
+I0319 21:10:54.520208 21384 net.cpp:434] poolL1 <- convL1
+I0319 21:10:54.520213 21384 net.cpp:408] poolL1 -> poolL1
+I0319 21:10:54.520221 21384 net.cpp:150] Setting up poolL1
+I0319 21:10:54.520226 21384 net.cpp:157] Top shape: 1 8 31 31 (7688)
+I0319 21:10:54.520229 21384 net.cpp:165] Memory required for data: 1080352
+I0319 21:10:54.520232 21384 layer_factory.hpp:77] Creating layer convL2
+I0319 21:10:54.520239 21384 net.cpp:100] Creating Layer convL2
+I0319 21:10:54.520243 21384 net.cpp:434] convL2 <- poolL1
+I0319 21:10:54.520249 21384 net.cpp:408] convL2 -> convL2
+I0319 21:10:54.520273 21384 net.cpp:150] Setting up convL2
+I0319 21:10:54.520278 21384 net.cpp:157] Top shape: 1 8 27 27 (5832)
+I0319 21:10:54.520282 21384 net.cpp:165] Memory required for data: 1103680
+I0319 21:10:54.520287 21384 layer_factory.hpp:77] Creating layer ReLUconvL2
+I0319 21:10:54.520292 21384 net.cpp:100] Creating Layer ReLUconvL2
+I0319 21:10:54.520295 21384 net.cpp:434] ReLUconvL2 <- convL2
+I0319 21:10:54.520301 21384 net.cpp:395] ReLUconvL2 -> convL2 (in-place)
+I0319 21:10:54.520306 21384 net.cpp:150] Setting up ReLUconvL2
+I0319 21:10:54.520310 21384 net.cpp:157] Top shape: 1 8 27 27 (5832)
+I0319 21:10:54.520313 21384 net.cpp:165] Memory required for data: 1127008
+I0319 21:10:54.520316 21384 layer_factory.hpp:77] Creating layer poolL2
+I0319 21:10:54.520321 21384 net.cpp:100] Creating Layer poolL2
+I0319 21:10:54.520324 21384 net.cpp:434] poolL2 <- convL2
+I0319 21:10:54.520330 21384 net.cpp:408] poolL2 -> poolL2
+I0319 21:10:54.520336 21384 net.cpp:150] Setting up poolL2
+I0319 21:10:54.520340 21384 net.cpp:157] Top shape: 1 8 14 14 (1568)
+I0319 21:10:54.520344 21384 net.cpp:165] Memory required for data: 1133280
+I0319 21:10:54.520346 21384 layer_factory.hpp:77] Creating layer convL3
+I0319 21:10:54.520354 21384 net.cpp:100] Creating Layer convL3
+I0319 21:10:54.520360 21384 net.cpp:434] convL3 <- poolL2
+I0319 21:10:54.520366 21384 net.cpp:408] convL3 -> convL3
+I0319 21:10:54.520382 21384 net.cpp:150] Setting up convL3
+I0319 21:10:54.520387 21384 net.cpp:157] Top shape: 1 8 12 12 (1152)
+I0319 21:10:54.520391 21384 net.cpp:165] Memory required for data: 1137888
+I0319 21:10:54.520397 21384 layer_factory.hpp:77] Creating layer ReLUconvL3
+I0319 21:10:54.520404 21384 net.cpp:100] Creating Layer ReLUconvL3
+I0319 21:10:54.520407 21384 net.cpp:434] ReLUconvL3 <- convL3
+I0319 21:10:54.520411 21384 net.cpp:395] ReLUconvL3 -> convL3 (in-place)
+I0319 21:10:54.520416 21384 net.cpp:150] Setting up ReLUconvL3
+I0319 21:10:54.520421 21384 net.cpp:157] Top shape: 1 8 12 12 (1152)
+I0319 21:10:54.520423 21384 net.cpp:165] Memory required for data: 1142496
+I0319 21:10:54.520427 21384 layer_factory.hpp:77] Creating layer FC1
+I0319 21:10:54.520432 21384 net.cpp:100] Creating Layer FC1
+I0319 21:10:54.520437 21384 net.cpp:434] FC1 <- convL3
+I0319 21:10:54.520440 21384 net.cpp:408] FC1 -> FC1
+I0319 21:10:54.525383 21384 net.cpp:150] Setting up FC1
+I0319 21:10:54.525395 21384 net.cpp:157] Top shape: 1 1024 (1024)
+I0319 21:10:54.525398 21384 net.cpp:165] Memory required for data: 1146592
+I0319 21:10:54.525403 21384 layer_factory.hpp:77] Creating layer ReLUFC1
+I0319 21:10:54.525409 21384 net.cpp:100] Creating Layer ReLUFC1
+I0319 21:10:54.525413 21384 net.cpp:434] ReLUFC1 <- FC1
+I0319 21:10:54.525418 21384 net.cpp:395] ReLUFC1 -> FC1 (in-place)
+I0319 21:10:54.525424 21384 net.cpp:150] Setting up ReLUFC1
+I0319 21:10:54.525427 21384 net.cpp:157] Top shape: 1 1024 (1024)
+I0319 21:10:54.525431 21384 net.cpp:165] Memory required for data: 1150688
+I0319 21:10:54.525434 21384 layer_factory.hpp:77] Creating layer DropoutFC1
+I0319 21:10:54.525439 21384 net.cpp:100] Creating Layer DropoutFC1
+I0319 21:10:54.525442 21384 net.cpp:434] DropoutFC1 <- FC1
+I0319 21:10:54.525447 21384 net.cpp:395] DropoutFC1 -> FC1 (in-place)
+I0319 21:10:54.525454 21384 net.cpp:150] Setting up DropoutFC1
+I0319 21:10:54.525457 21384 net.cpp:157] Top shape: 1 1024 (1024)
+I0319 21:10:54.525460 21384 net.cpp:165] Memory required for data: 1154784
+I0319 21:10:54.525463 21384 layer_factory.hpp:77] Creating layer FC2
+I0319 21:10:54.525470 21384 net.cpp:100] Creating Layer FC2
+I0319 21:10:54.525473 21384 net.cpp:434] FC2 <- FC1
+I0319 21:10:54.525477 21384 net.cpp:408] FC2 -> FC2
+I0319 21:10:54.530079 21384 net.cpp:150] Setting up FC2
+I0319 21:10:54.530092 21384 net.cpp:157] Top shape: 1 1024 (1024)
+I0319 21:10:54.530095 21384 net.cpp:165] Memory required for data: 1158880
+I0319 21:10:54.530103 21384 layer_factory.hpp:77] Creating layer ReLUFC2
+I0319 21:10:54.530108 21384 net.cpp:100] Creating Layer ReLUFC2
+I0319 21:10:54.530112 21384 net.cpp:434] ReLUFC2 <- FC2
+I0319 21:10:54.530117 21384 net.cpp:395] ReLUFC2 -> FC2 (in-place)
+I0319 21:10:54.530123 21384 net.cpp:150] Setting up ReLUFC2
+I0319 21:10:54.530128 21384 net.cpp:157] Top shape: 1 1024 (1024)
+I0319 21:10:54.530130 21384 net.cpp:165] Memory required for data: 1162976
+I0319 21:10:54.530133 21384 layer_factory.hpp:77] Creating layer DropoutFC2
+I0319 21:10:54.530138 21384 net.cpp:100] Creating Layer DropoutFC2
+I0319 21:10:54.530143 21384 net.cpp:434] DropoutFC2 <- FC2
+I0319 21:10:54.530146 21384 net.cpp:395] DropoutFC2 -> FC2 (in-place)
+I0319 21:10:54.530151 21384 net.cpp:150] Setting up DropoutFC2
+I0319 21:10:54.530155 21384 net.cpp:157] Top shape: 1 1024 (1024)
+I0319 21:10:54.530158 21384 net.cpp:165] Memory required for data: 1167072
+I0319 21:10:54.530161 21384 layer_factory.hpp:77] Creating layer DoF
+I0319 21:10:54.530166 21384 net.cpp:100] Creating Layer DoF
+I0319 21:10:54.530170 21384 net.cpp:434] DoF <- FC2
+I0319 21:10:54.530175 21384 net.cpp:408] DoF -> DoF
+I0319 21:10:54.530410 21384 net.cpp:150] Setting up DoF
+I0319 21:10:54.530417 21384 net.cpp:157] Top shape: 1 47 (47)
+I0319 21:10:54.530421 21384 net.cpp:165] Memory required for data: 1167260
+I0319 21:10:54.530426 21384 layer_factory.hpp:77] Creating layer DeepHandModel
+I0319 21:10:54.530443 21384 net.cpp:100] Creating Layer DeepHandModel
+I0319 21:10:54.530452 21384 net.cpp:434] DeepHandModel <- DoF
+I0319 21:10:54.530457 21384 net.cpp:408] DeepHandModel -> pred
+I0319 21:10:54.530534 21384 net.cpp:150] Setting up DeepHandModel
+I0319 21:10:54.530542 21384 net.cpp:157] Top shape: 1 93 (93)
+I0319 21:10:54.530545 21384 net.cpp:165] Memory required for data: 1167632
+I0319 21:10:54.530550 21384 net.cpp:228] DeepHandModel does not need backward computation.
+I0319 21:10:54.530552 21384 net.cpp:228] DoF does not need backward computation.
+I0319 21:10:54.530556 21384 net.cpp:228] DropoutFC2 does not need backward computation.
+I0319 21:10:54.530560 21384 net.cpp:228] ReLUFC2 does not need backward computation.
+I0319 21:10:54.530562 21384 net.cpp:228] FC2 does not need backward computation.
+I0319 21:10:54.530566 21384 net.cpp:228] DropoutFC1 does not need backward computation.
+I0319 21:10:54.530570 21384 net.cpp:228] ReLUFC1 does not need backward computation.
+I0319 21:10:54.530572 21384 net.cpp:228] FC1 does not need backward computation.
+I0319 21:10:54.530576 21384 net.cpp:228] ReLUconvL3 does not need backward computation.
+I0319 21:10:54.530580 21384 net.cpp:228] convL3 does not need backward computation.
+I0319 21:10:54.530583 21384 net.cpp:228] poolL2 does not need backward computation.
+I0319 21:10:54.530586 21384 net.cpp:228] ReLUconvL2 does not need backward computation.
+I0319 21:10:54.530589 21384 net.cpp:228] convL2 does not need backward computation.
+I0319 21:10:54.530593 21384 net.cpp:228] poolL1 does not need backward computation.
+I0319 21:10:54.530596 21384 net.cpp:228] ReLUconvL1 does not need backward computation.
+I0319 21:10:54.530601 21384 net.cpp:228] convL1 does not need backward computation.
+I0319 21:10:54.530603 21384 net.cpp:228] input does not need backward computation.
+I0319 21:10:54.530607 21384 net.cpp:270] This network produces output pred
+I0319 21:10:54.530617 21384 net.cpp:283] Network initialization done.
+I0319 21:10:54.535698 21384 net.cpp:761] Ignoring source layer data
+I0319 21:10:54.537137 21384 net.cpp:761] Ignoring source layer DeepHandModelxyzloss
+WSGI app 0 (mountpoint='/handPose_recog') ready in 1 seconds on interpreter 0x1054540 pid: 21384 (default app)
+*** uWSGI is running in multiple interpreter mode ***
+spawned uWSGI worker 1 (and the only) (pid: 21384, cores: 1)
+*** Starting uWSGI 2.0.14 (64bit) on [Sun Mar 19 21:17:23 2017] ***
+compiled with version: 4.8.4 on 27 October 2016 14:27:44
+os: Linux-4.2.0-27-generic #32~14.04.1-Ubuntu SMP Fri Jan 22 15:32:26 UTC 2016
+nodename: cbsr-wj-server
+machine: x86_64
+clock source: unix
+pcre jit disabled
+detected number of CPU cores: 12
+current working directory: /data4/jiali/hand/testing
+detected binary path: /usr/local/bin/uwsgi
+chdir() to /data4/jiali/hand/testing/
+*** WARNING: you are running uWSGI without its master process manager ***
+your processes number limit is 256300
+your memory page size is 4096 bytes
+detected max file descriptor number: 1024
+lock engine: pthread robust mutexes
+thunder lock: disabled (you can enable it with --thunder-lock)
+uwsgi socket 0 bound to UNIX address /data4/jiali/hand/testing/handPose_recog.sock fd 3
+Python version: 2.7.6 (default, Jun 22 2015, 18:01:27)  [GCC 4.8.2]
+*** Python threads support is disabled. You can enable it with --enable-threads ***
+Python main interpreter initialized at 0x2509540
+your server socket listen backlog is limited to 100 connections
+your mercy for graceful operations on workers is 60 seconds
+mapped 72768 bytes (71 KB) for 1 cores
+*** Operational MODE: single process ***
+mounting demo_server.py on /handPose_recog
+pycaffe_root ~/caffe/python/pycaffe
+
+NYU_path /data2/duanjiali/NYU/
+WARNING: Logging before InitGoogleLogging() is written to STDERR
+W0319 21:17:24.394212 22221 _caffe.cpp:122] DEPRECATION WARNING - deprecated use of Python interface
+W0319 21:17:24.394246 22221 _caffe.cpp:123] Use this instead (with the named "weights" parameter):
+W0319 21:17:24.394250 22221 _caffe.cpp:125] Net('DeepModel_deploy.prototxt', 1, weights='weights/NYU.caffemodel')
+I0319 21:17:24.395702 22221 upgrade_proto.cpp:67] Attempting to upgrade input file specified using deprecated input fields: DeepModel_deploy.prototxt
+I0319 21:17:24.395728 22221 upgrade_proto.cpp:70] Successfully upgraded file specified using deprecated input fields.
+W0319 21:17:24.395732 22221 upgrade_proto.cpp:72] Note that future Caffe releases will only support input layers and not input fields.
+I0319 21:17:24.845335 22221 net.cpp:58] Initializing net from parameters: 
+name: "DeepModel"
+state {
+  phase: TEST
+  level: 0
+}
+layer {
+  name: "input"
+  type: "Input"
+  top: "data"
+  input_param {
+    shape {
+      dim: 1
+      dim: 1
+      dim: 128
+      dim: 128
+    }
+  }
+}
+layer {
+  name: "convL1"
+  type: "Convolution"
+  bottom: "data"
+  top: "convL1"
+  convolution_param {
+    num_output: 8
+    kernel_size: 5
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "ReLUconvL1"
+  type: "ReLU"
+  bottom: "convL1"
+  top: "convL1"
+}
+layer {
+  name: "poolL1"
+  type: "Pooling"
+  bottom: "convL1"
+  top: "poolL1"
+  pooling_param {
+    pool: MAX
+    kernel_size: 4
+    stride: 4
+  }
+}
+layer {
+  name: "convL2"
+  type: "Convolution"
+  bottom: "poolL1"
+  top: "convL2"
+  convolution_param {
+    num_output: 8
+    kernel_size: 5
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "ReLUconvL2"
+  type: "ReLU"
+  bottom: "convL2"
+  top: "convL2"
+}
+layer {
+  name: "poolL2"
+  type: "Pooling"
+  bottom: "convL2"
+  top: "poolL2"
+  pooling_param {
+    pool: MAX
+    kernel_size: 2
+    stride: 2
+  }
+}
+layer {
+  name: "convL3"
+  type: "Convolution"
+  bottom: "poolL2"
+  top: "convL3"
+  convolution_param {
+    num_output: 8
+    kernel_size: 3
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "ReLUconvL3"
+  type: "ReLU"
+  bottom: "convL3"
+  top: "convL3"
+}
+layer {
+  name: "FC1"
+  type: "InnerProduct"
+  bottom: "convL3"
+  top: "FC1"
+  param {
+    lr_mult: 1
+  }
+  inner_product_param {
+    num_output: 1024
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "ReLUFC1"
+  type: "ReLU"
+  bottom: "FC1"
+  top: "FC1"
+}
+layer {
+  name: "DropoutFC1"
+  type: "Dropout"
+  bottom: "FC1"
+  top: "FC1"
+  dropout_param {
+    dropout_ratio: 0.3
+  }
+}
+layer {
+  name: "FC2"
+  type: "InnerProduct"
+  bottom: "FC1"
+  top: "FC2"
+  param {
+    lr_mult: 1
+  }
+  inner_product_param {
+    num_output: 1024
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "ReLUFC2"
+  type: "ReLU"
+  bottom: "FC2"
+  top: "FC2"
+}
+layer {
+  name: "DropoutFC2"
+  type: "Dropout"
+  bottom: "FC2"
+  top: "FC2"
+  dropout_param {
+    dropout_ratio: 0.3
+  }
+}
+layer {
+  name: "DoF"
+  type: "InnerProduct"
+  bottom: "FC2"
+  top: "DoF"
+  param {
+    lr_mult: 1
+  }
+  inner_product_param {
+    num_output: 47
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "DeepHandModel"
+  type: "DeepHandModel"
+  bottom: "DoF"
+  top: "pred"
+}
+I0319 21:17:24.845412 22221 layer_factory.hpp:77] Creating layer input
+I0319 21:17:24.845424 22221 net.cpp:100] Creating Layer input
+I0319 21:17:24.845429 22221 net.cpp:408] input -> data
+I0319 21:17:24.845448 22221 net.cpp:150] Setting up input
+I0319 21:17:24.845456 22221 net.cpp:157] Top shape: 1 1 128 128 (16384)
+I0319 21:17:24.845460 22221 net.cpp:165] Memory required for data: 65536
+I0319 21:17:24.845463 22221 layer_factory.hpp:77] Creating layer convL1
+I0319 21:17:24.845473 22221 net.cpp:100] Creating Layer convL1
+I0319 21:17:24.845476 22221 net.cpp:434] convL1 <- data
+I0319 21:17:24.845481 22221 net.cpp:408] convL1 -> convL1
+I0319 21:17:24.845806 22221 net.cpp:150] Setting up convL1
+I0319 21:17:24.845818 22221 net.cpp:157] Top shape: 1 8 124 124 (123008)
+I0319 21:17:24.845820 22221 net.cpp:165] Memory required for data: 557568
+I0319 21:17:24.845829 22221 layer_factory.hpp:77] Creating layer ReLUconvL1
+I0319 21:17:24.845836 22221 net.cpp:100] Creating Layer ReLUconvL1
+I0319 21:17:24.845847 22221 net.cpp:434] ReLUconvL1 <- convL1
+I0319 21:17:24.845852 22221 net.cpp:395] ReLUconvL1 -> convL1 (in-place)
+I0319 21:17:24.845859 22221 net.cpp:150] Setting up ReLUconvL1
+I0319 21:17:24.845863 22221 net.cpp:157] Top shape: 1 8 124 124 (123008)
+I0319 21:17:24.845866 22221 net.cpp:165] Memory required for data: 1049600
+I0319 21:17:24.845870 22221 layer_factory.hpp:77] Creating layer poolL1
+I0319 21:17:24.845875 22221 net.cpp:100] Creating Layer poolL1
+I0319 21:17:24.845878 22221 net.cpp:434] poolL1 <- convL1
+I0319 21:17:24.845882 22221 net.cpp:408] poolL1 -> poolL1
+I0319 21:17:24.845890 22221 net.cpp:150] Setting up poolL1
+I0319 21:17:24.845896 22221 net.cpp:157] Top shape: 1 8 31 31 (7688)
+I0319 21:17:24.845898 22221 net.cpp:165] Memory required for data: 1080352
+I0319 21:17:24.845901 22221 layer_factory.hpp:77] Creating layer convL2
+I0319 21:17:24.845908 22221 net.cpp:100] Creating Layer convL2
+I0319 21:17:24.845911 22221 net.cpp:434] convL2 <- poolL1
+I0319 21:17:24.845916 22221 net.cpp:408] convL2 -> convL2
+I0319 21:17:24.845935 22221 net.cpp:150] Setting up convL2
+I0319 21:17:24.845940 22221 net.cpp:157] Top shape: 1 8 27 27 (5832)
+I0319 21:17:24.845944 22221 net.cpp:165] Memory required for data: 1103680
+I0319 21:17:24.845950 22221 layer_factory.hpp:77] Creating layer ReLUconvL2
+I0319 21:17:24.845954 22221 net.cpp:100] Creating Layer ReLUconvL2
+I0319 21:17:24.845958 22221 net.cpp:434] ReLUconvL2 <- convL2
+I0319 21:17:24.845963 22221 net.cpp:395] ReLUconvL2 -> convL2 (in-place)
+I0319 21:17:24.845966 22221 net.cpp:150] Setting up ReLUconvL2
+I0319 21:17:24.845971 22221 net.cpp:157] Top shape: 1 8 27 27 (5832)
+I0319 21:17:24.845974 22221 net.cpp:165] Memory required for data: 1127008
+I0319 21:17:24.845978 22221 layer_factory.hpp:77] Creating layer poolL2
+I0319 21:17:24.845981 22221 net.cpp:100] Creating Layer poolL2
+I0319 21:17:24.845984 22221 net.cpp:434] poolL2 <- convL2
+I0319 21:17:24.845989 22221 net.cpp:408] poolL2 -> poolL2
+I0319 21:17:24.845995 22221 net.cpp:150] Setting up poolL2
+I0319 21:17:24.845999 22221 net.cpp:157] Top shape: 1 8 14 14 (1568)
+I0319 21:17:24.846002 22221 net.cpp:165] Memory required for data: 1133280
+I0319 21:17:24.846005 22221 layer_factory.hpp:77] Creating layer convL3
+I0319 21:17:24.846011 22221 net.cpp:100] Creating Layer convL3
+I0319 21:17:24.846014 22221 net.cpp:434] convL3 <- poolL2
+I0319 21:17:24.846019 22221 net.cpp:408] convL3 -> convL3
+I0319 21:17:24.846032 22221 net.cpp:150] Setting up convL3
+I0319 21:17:24.846037 22221 net.cpp:157] Top shape: 1 8 12 12 (1152)
+I0319 21:17:24.846040 22221 net.cpp:165] Memory required for data: 1137888
+I0319 21:17:24.846046 22221 layer_factory.hpp:77] Creating layer ReLUconvL3
+I0319 21:17:24.846051 22221 net.cpp:100] Creating Layer ReLUconvL3
+I0319 21:17:24.846055 22221 net.cpp:434] ReLUconvL3 <- convL3
+I0319 21:17:24.846058 22221 net.cpp:395] ReLUconvL3 -> convL3 (in-place)
+I0319 21:17:24.846063 22221 net.cpp:150] Setting up ReLUconvL3
+I0319 21:17:24.846067 22221 net.cpp:157] Top shape: 1 8 12 12 (1152)
+I0319 21:17:24.846071 22221 net.cpp:165] Memory required for data: 1142496
+I0319 21:17:24.846073 22221 layer_factory.hpp:77] Creating layer FC1
+I0319 21:17:24.846079 22221 net.cpp:100] Creating Layer FC1
+I0319 21:17:24.846082 22221 net.cpp:434] FC1 <- convL3
+I0319 21:17:24.846087 22221 net.cpp:408] FC1 -> FC1
+I0319 21:17:24.851297 22221 net.cpp:150] Setting up FC1
+I0319 21:17:24.851311 22221 net.cpp:157] Top shape: 1 1024 (1024)
+I0319 21:17:24.851315 22221 net.cpp:165] Memory required for data: 1146592
+I0319 21:17:24.851320 22221 layer_factory.hpp:77] Creating layer ReLUFC1
+I0319 21:17:24.851326 22221 net.cpp:100] Creating Layer ReLUFC1
+I0319 21:17:24.851330 22221 net.cpp:434] ReLUFC1 <- FC1
+I0319 21:17:24.851333 22221 net.cpp:395] ReLUFC1 -> FC1 (in-place)
+I0319 21:17:24.851339 22221 net.cpp:150] Setting up ReLUFC1
+I0319 21:17:24.851343 22221 net.cpp:157] Top shape: 1 1024 (1024)
+I0319 21:17:24.851346 22221 net.cpp:165] Memory required for data: 1150688
+I0319 21:17:24.851349 22221 layer_factory.hpp:77] Creating layer DropoutFC1
+I0319 21:17:24.851358 22221 net.cpp:100] Creating Layer DropoutFC1
+I0319 21:17:24.851362 22221 net.cpp:434] DropoutFC1 <- FC1
+I0319 21:17:24.851366 22221 net.cpp:395] DropoutFC1 -> FC1 (in-place)
+I0319 21:17:24.851373 22221 net.cpp:150] Setting up DropoutFC1
+I0319 21:17:24.851377 22221 net.cpp:157] Top shape: 1 1024 (1024)
+I0319 21:17:24.851380 22221 net.cpp:165] Memory required for data: 1154784
+I0319 21:17:24.851383 22221 layer_factory.hpp:77] Creating layer FC2
+I0319 21:17:24.851388 22221 net.cpp:100] Creating Layer FC2
+I0319 21:17:24.851392 22221 net.cpp:434] FC2 <- FC1
+I0319 21:17:24.851397 22221 net.cpp:408] FC2 -> FC2
+I0319 21:17:24.855995 22221 net.cpp:150] Setting up FC2
+I0319 21:17:24.856009 22221 net.cpp:157] Top shape: 1 1024 (1024)
+I0319 21:17:24.856012 22221 net.cpp:165] Memory required for data: 1158880
+I0319 21:17:24.856020 22221 layer_factory.hpp:77] Creating layer ReLUFC2
+I0319 21:17:24.856026 22221 net.cpp:100] Creating Layer ReLUFC2
+I0319 21:17:24.856029 22221 net.cpp:434] ReLUFC2 <- FC2
+I0319 21:17:24.856034 22221 net.cpp:395] ReLUFC2 -> FC2 (in-place)
+I0319 21:17:24.856040 22221 net.cpp:150] Setting up ReLUFC2
+I0319 21:17:24.856043 22221 net.cpp:157] Top shape: 1 1024 (1024)
+I0319 21:17:24.856046 22221 net.cpp:165] Memory required for data: 1162976
+I0319 21:17:24.856050 22221 layer_factory.hpp:77] Creating layer DropoutFC2
+I0319 21:17:24.856055 22221 net.cpp:100] Creating Layer DropoutFC2
+I0319 21:17:24.856057 22221 net.cpp:434] DropoutFC2 <- FC2
+I0319 21:17:24.856061 22221 net.cpp:395] DropoutFC2 -> FC2 (in-place)
+I0319 21:17:24.856067 22221 net.cpp:150] Setting up DropoutFC2
+I0319 21:17:24.856071 22221 net.cpp:157] Top shape: 1 1024 (1024)
+I0319 21:17:24.856075 22221 net.cpp:165] Memory required for data: 1167072
+I0319 21:17:24.856077 22221 layer_factory.hpp:77] Creating layer DoF
+I0319 21:17:24.856082 22221 net.cpp:100] Creating Layer DoF
+I0319 21:17:24.856086 22221 net.cpp:434] DoF <- FC2
+I0319 21:17:24.856091 22221 net.cpp:408] DoF -> DoF
+I0319 21:17:24.856298 22221 net.cpp:150] Setting up DoF
+I0319 21:17:24.856307 22221 net.cpp:157] Top shape: 1 47 (47)
+I0319 21:17:24.856309 22221 net.cpp:165] Memory required for data: 1167260
+I0319 21:17:24.856314 22221 layer_factory.hpp:77] Creating layer DeepHandModel
+I0319 21:17:24.856333 22221 net.cpp:100] Creating Layer DeepHandModel
+I0319 21:17:24.856336 22221 net.cpp:434] DeepHandModel <- DoF
+I0319 21:17:24.856343 22221 net.cpp:408] DeepHandModel -> pred
+I0319 21:17:24.856418 22221 net.cpp:150] Setting up DeepHandModel
+I0319 21:17:24.856427 22221 net.cpp:157] Top shape: 1 93 (93)
+I0319 21:17:24.856431 22221 net.cpp:165] Memory required for data: 1167632
+I0319 21:17:24.856433 22221 net.cpp:228] DeepHandModel does not need backward computation.
+I0319 21:17:24.856437 22221 net.cpp:228] DoF does not need backward computation.
+I0319 21:17:24.856441 22221 net.cpp:228] DropoutFC2 does not need backward computation.
+I0319 21:17:24.856444 22221 net.cpp:228] ReLUFC2 does not need backward computation.
+I0319 21:17:24.856447 22221 net.cpp:228] FC2 does not need backward computation.
+I0319 21:17:24.856451 22221 net.cpp:228] DropoutFC1 does not need backward computation.
+I0319 21:17:24.856453 22221 net.cpp:228] ReLUFC1 does not need backward computation.
+I0319 21:17:24.856457 22221 net.cpp:228] FC1 does not need backward computation.
+I0319 21:17:24.856461 22221 net.cpp:228] ReLUconvL3 does not need backward computation.
+I0319 21:17:24.856463 22221 net.cpp:228] convL3 does not need backward computation.
+I0319 21:17:24.856467 22221 net.cpp:228] poolL2 does not need backward computation.
+I0319 21:17:24.856470 22221 net.cpp:228] ReLUconvL2 does not need backward computation.
+I0319 21:17:24.856473 22221 net.cpp:228] convL2 does not need backward computation.
+I0319 21:17:24.856477 22221 net.cpp:228] poolL1 does not need backward computation.
+I0319 21:17:24.856480 22221 net.cpp:228] ReLUconvL1 does not need backward computation.
+I0319 21:17:24.856483 22221 net.cpp:228] convL1 does not need backward computation.
+I0319 21:17:24.856487 22221 net.cpp:228] input does not need backward computation.
+I0319 21:17:24.856493 22221 net.cpp:270] This network produces output pred
+I0319 21:17:24.856503 22221 net.cpp:283] Network initialization done.
+I0319 21:17:24.861459 22221 net.cpp:761] Ignoring source layer data
+I0319 21:17:24.862874 22221 net.cpp:761] Ignoring source layer DeepHandModelxyzloss
+WSGI app 0 (mountpoint='/handPose_recog') ready in 1 seconds on interpreter 0x2509540 pid: 22221 (default app)
+*** uWSGI is running in multiple interpreter mode ***
+spawned uWSGI worker 1 (and the only) (pid: 22221, cores: 1)
+*** Starting uWSGI 2.0.14 (64bit) on [Sun Mar 19 21:18:57 2017] ***
+compiled with version: 4.8.4 on 27 October 2016 14:27:44
+os: Linux-4.2.0-27-generic #32~14.04.1-Ubuntu SMP Fri Jan 22 15:32:26 UTC 2016
+nodename: cbsr-wj-server
+machine: x86_64
+clock source: unix
+pcre jit disabled
+detected number of CPU cores: 12
+current working directory: /data4/jiali/hand/testing
+detected binary path: /usr/local/bin/uwsgi
+chdir() to /data4/jiali/hand/testing/
+*** WARNING: you are running uWSGI without its master process manager ***
+your processes number limit is 256300
+your memory page size is 4096 bytes
+detected max file descriptor number: 1024
+lock engine: pthread robust mutexes
+thunder lock: disabled (you can enable it with --thunder-lock)
+uwsgi socket 0 bound to UNIX address /data4/jiali/hand/testing/handPose_recog.sock fd 3
+Python version: 2.7.6 (default, Jun 22 2015, 18:01:27)  [GCC 4.8.2]
+*** Python threads support is disabled. You can enable it with --enable-threads ***
+Python main interpreter initialized at 0x2433540
+your server socket listen backlog is limited to 100 connections
+your mercy for graceful operations on workers is 60 seconds
+mapped 72768 bytes (71 KB) for 1 cores
+*** Operational MODE: single process ***
+mounting demo_server.py on /
+pycaffe_root ~/caffe/python/pycaffe
+
+NYU_path /data2/duanjiali/NYU/
+WARNING: Logging before InitGoogleLogging() is written to STDERR
+W0319 21:18:58.328183 22490 _caffe.cpp:122] DEPRECATION WARNING - deprecated use of Python interface
+W0319 21:18:58.328219 22490 _caffe.cpp:123] Use this instead (with the named "weights" parameter):
+W0319 21:18:58.328223 22490 _caffe.cpp:125] Net('DeepModel_deploy.prototxt', 1, weights='weights/NYU.caffemodel')
+I0319 21:18:58.329706 22490 upgrade_proto.cpp:67] Attempting to upgrade input file specified using deprecated input fields: DeepModel_deploy.prototxt
+I0319 21:18:58.329725 22490 upgrade_proto.cpp:70] Successfully upgraded file specified using deprecated input fields.
+W0319 21:18:58.329730 22490 upgrade_proto.cpp:72] Note that future Caffe releases will only support input layers and not input fields.
+I0319 21:18:58.812039 22490 net.cpp:58] Initializing net from parameters: 
+name: "DeepModel"
+state {
+  phase: TEST
+  level: 0
+}
+layer {
+  name: "input"
+  type: "Input"
+  top: "data"
+  input_param {
+    shape {
+      dim: 1
+      dim: 1
+      dim: 128
+      dim: 128
+    }
+  }
+}
+layer {
+  name: "convL1"
+  type: "Convolution"
+  bottom: "data"
+  top: "convL1"
+  convolution_param {
+    num_output: 8
+    kernel_size: 5
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "ReLUconvL1"
+  type: "ReLU"
+  bottom: "convL1"
+  top: "convL1"
+}
+layer {
+  name: "poolL1"
+  type: "Pooling"
+  bottom: "convL1"
+  top: "poolL1"
+  pooling_param {
+    pool: MAX
+    kernel_size: 4
+    stride: 4
+  }
+}
+layer {
+  name: "convL2"
+  type: "Convolution"
+  bottom: "poolL1"
+  top: "convL2"
+  convolution_param {
+    num_output: 8
+    kernel_size: 5
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "ReLUconvL2"
+  type: "ReLU"
+  bottom: "convL2"
+  top: "convL2"
+}
+layer {
+  name: "poolL2"
+  type: "Pooling"
+  bottom: "convL2"
+  top: "poolL2"
+  pooling_param {
+    pool: MAX
+    kernel_size: 2
+    stride: 2
+  }
+}
+layer {
+  name: "convL3"
+  type: "Convolution"
+  bottom: "poolL2"
+  top: "convL3"
+  convolution_param {
+    num_output: 8
+    kernel_size: 3
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "ReLUconvL3"
+  type: "ReLU"
+  bottom: "convL3"
+  top: "convL3"
+}
+layer {
+  name: "FC1"
+  type: "InnerProduct"
+  bottom: "convL3"
+  top: "FC1"
+  param {
+    lr_mult: 1
+  }
+  inner_product_param {
+    num_output: 1024
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "ReLUFC1"
+  type: "ReLU"
+  bottom: "FC1"
+  top: "FC1"
+}
+layer {
+  name: "DropoutFC1"
+  type: "Dropout"
+  bottom: "FC1"
+  top: "FC1"
+  dropout_param {
+    dropout_ratio: 0.3
+  }
+}
+layer {
+  name: "FC2"
+  type: "InnerProduct"
+  bottom: "FC1"
+  top: "FC2"
+  param {
+    lr_mult: 1
+  }
+  inner_product_param {
+    num_output: 1024
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "ReLUFC2"
+  type: "ReLU"
+  bottom: "FC2"
+  top: "FC2"
+}
+layer {
+  name: "DropoutFC2"
+  type: "Dropout"
+  bottom: "FC2"
+  top: "FC2"
+  dropout_param {
+    dropout_ratio: 0.3
+  }
+}
+layer {
+  name: "DoF"
+  type: "InnerProduct"
+  bottom: "FC2"
+  top: "DoF"
+  param {
+    lr_mult: 1
+  }
+  inner_product_param {
+    num_output: 47
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "DeepHandModel"
+  type: "DeepHandModel"
+  bottom: "DoF"
+  top: "pred"
+}
+I0319 21:18:58.812129 22490 layer_factory.hpp:77] Creating layer input
+I0319 21:18:58.812532 22490 net.cpp:100] Creating Layer input
+I0319 21:18:58.812566 22490 net.cpp:408] input -> data
+I0319 21:18:58.812608 22490 net.cpp:150] Setting up input
+I0319 21:18:58.812626 22490 net.cpp:157] Top shape: 1 1 128 128 (16384)
+I0319 21:18:58.812635 22490 net.cpp:165] Memory required for data: 65536
+I0319 21:18:58.812646 22490 layer_factory.hpp:77] Creating layer convL1
+I0319 21:18:58.812669 22490 net.cpp:100] Creating Layer convL1
+I0319 21:18:58.812680 22490 net.cpp:434] convL1 <- data
+I0319 21:18:58.812692 22490 net.cpp:408] convL1 -> convL1
+I0319 21:18:58.813486 22490 net.cpp:150] Setting up convL1
+I0319 21:18:58.813514 22490 net.cpp:157] Top shape: 1 8 124 124 (123008)
+I0319 21:18:58.813524 22490 net.cpp:165] Memory required for data: 557568
+I0319 21:18:58.813546 22490 layer_factory.hpp:77] Creating layer ReLUconvL1
+I0319 21:18:58.813565 22490 net.cpp:100] Creating Layer ReLUconvL1
+I0319 21:18:58.813576 22490 net.cpp:434] ReLUconvL1 <- convL1
+I0319 21:18:58.813588 22490 net.cpp:395] ReLUconvL1 -> convL1 (in-place)
+I0319 21:18:58.813604 22490 net.cpp:150] Setting up ReLUconvL1
+I0319 21:18:58.813616 22490 net.cpp:157] Top shape: 1 8 124 124 (123008)
+I0319 21:18:58.813626 22490 net.cpp:165] Memory required for data: 1049600
+I0319 21:18:58.813634 22490 layer_factory.hpp:77] Creating layer poolL1
+I0319 21:18:58.813647 22490 net.cpp:100] Creating Layer poolL1
+I0319 21:18:58.813657 22490 net.cpp:434] poolL1 <- convL1
+I0319 21:18:58.813671 22490 net.cpp:408] poolL1 -> poolL1
+I0319 21:18:58.813691 22490 net.cpp:150] Setting up poolL1
+I0319 21:18:58.813704 22490 net.cpp:157] Top shape: 1 8 31 31 (7688)
+I0319 21:18:58.813714 22490 net.cpp:165] Memory required for data: 1080352
+I0319 21:18:58.813721 22490 layer_factory.hpp:77] Creating layer convL2
+I0319 21:18:58.813741 22490 net.cpp:100] Creating Layer convL2
+I0319 21:18:58.813751 22490 net.cpp:434] convL2 <- poolL1
+I0319 21:18:58.813766 22490 net.cpp:408] convL2 -> convL2
+I0319 21:18:58.813832 22490 net.cpp:150] Setting up convL2
+I0319 21:18:58.813846 22490 net.cpp:157] Top shape: 1 8 27 27 (5832)
+I0319 21:18:58.813855 22490 net.cpp:165] Memory required for data: 1103680
+I0319 21:18:58.813871 22490 layer_factory.hpp:77] Creating layer ReLUconvL2
+I0319 21:18:58.813884 22490 net.cpp:100] Creating Layer ReLUconvL2
+I0319 21:18:58.813894 22490 net.cpp:434] ReLUconvL2 <- convL2
+I0319 21:18:58.813906 22490 net.cpp:395] ReLUconvL2 -> convL2 (in-place)
+I0319 21:18:58.813920 22490 net.cpp:150] Setting up ReLUconvL2
+I0319 21:18:58.813931 22490 net.cpp:157] Top shape: 1 8 27 27 (5832)
+I0319 21:18:58.813941 22490 net.cpp:165] Memory required for data: 1127008
+I0319 21:18:58.813949 22490 layer_factory.hpp:77] Creating layer poolL2
+I0319 21:18:58.813971 22490 net.cpp:100] Creating Layer poolL2
+I0319 21:18:58.813982 22490 net.cpp:434] poolL2 <- convL2
+I0319 21:18:58.813993 22490 net.cpp:408] poolL2 -> poolL2
+I0319 21:18:58.814012 22490 net.cpp:150] Setting up poolL2
+I0319 21:18:58.814024 22490 net.cpp:157] Top shape: 1 8 14 14 (1568)
+I0319 21:18:58.814033 22490 net.cpp:165] Memory required for data: 1133280
+I0319 21:18:58.814041 22490 layer_factory.hpp:77] Creating layer convL3
+I0319 21:18:58.814061 22490 net.cpp:100] Creating Layer convL3
+I0319 21:18:58.814071 22490 net.cpp:434] convL3 <- poolL2
+I0319 21:18:58.814083 22490 net.cpp:408] convL3 -> convL3
+I0319 21:18:58.814128 22490 net.cpp:150] Setting up convL3
+I0319 21:18:58.814142 22490 net.cpp:157] Top shape: 1 8 12 12 (1152)
+I0319 21:18:58.814152 22490 net.cpp:165] Memory required for data: 1137888
+I0319 21:18:58.814167 22490 layer_factory.hpp:77] Creating layer ReLUconvL3
+I0319 21:18:58.814182 22490 net.cpp:100] Creating Layer ReLUconvL3
+I0319 21:18:58.814190 22490 net.cpp:434] ReLUconvL3 <- convL3
+I0319 21:18:58.814201 22490 net.cpp:395] ReLUconvL3 -> convL3 (in-place)
+I0319 21:18:58.814214 22490 net.cpp:150] Setting up ReLUconvL3
+I0319 21:18:58.814225 22490 net.cpp:157] Top shape: 1 8 12 12 (1152)
+I0319 21:18:58.814234 22490 net.cpp:165] Memory required for data: 1142496
+I0319 21:18:58.814242 22490 layer_factory.hpp:77] Creating layer FC1
+I0319 21:18:58.814257 22490 net.cpp:100] Creating Layer FC1
+I0319 21:18:58.814266 22490 net.cpp:434] FC1 <- convL3
+I0319 21:18:58.814282 22490 net.cpp:408] FC1 -> FC1
+I0319 21:18:58.828366 22490 net.cpp:150] Setting up FC1
+I0319 21:18:58.828395 22490 net.cpp:157] Top shape: 1 1024 (1024)
+I0319 21:18:58.828404 22490 net.cpp:165] Memory required for data: 1146592
+I0319 21:18:58.828418 22490 layer_factory.hpp:77] Creating layer ReLUFC1
+I0319 21:18:58.828431 22490 net.cpp:100] Creating Layer ReLUFC1
+I0319 21:18:58.828439 22490 net.cpp:434] ReLUFC1 <- FC1
+I0319 21:18:58.828451 22490 net.cpp:395] ReLUFC1 -> FC1 (in-place)
+I0319 21:18:58.828464 22490 net.cpp:150] Setting up ReLUFC1
+I0319 21:18:58.828475 22490 net.cpp:157] Top shape: 1 1024 (1024)
+I0319 21:18:58.828483 22490 net.cpp:165] Memory required for data: 1150688
+I0319 21:18:58.828491 22490 layer_factory.hpp:77] Creating layer DropoutFC1
+I0319 21:18:58.828506 22490 net.cpp:100] Creating Layer DropoutFC1
+I0319 21:18:58.828516 22490 net.cpp:434] DropoutFC1 <- FC1
+I0319 21:18:58.828527 22490 net.cpp:395] DropoutFC1 -> FC1 (in-place)
+I0319 21:18:58.828541 22490 net.cpp:150] Setting up DropoutFC1
+I0319 21:18:58.828552 22490 net.cpp:157] Top shape: 1 1024 (1024)
+I0319 21:18:58.828559 22490 net.cpp:165] Memory required for data: 1154784
+I0319 21:18:58.828567 22490 layer_factory.hpp:77] Creating layer FC2
+I0319 21:18:58.828580 22490 net.cpp:100] Creating Layer FC2
+I0319 21:18:58.828588 22490 net.cpp:434] FC2 <- FC1
+I0319 21:18:58.828600 22490 net.cpp:408] FC2 -> FC2
+I0319 21:18:58.840072 22490 net.cpp:150] Setting up FC2
+I0319 21:18:58.840095 22490 net.cpp:157] Top shape: 1 1024 (1024)
+I0319 21:18:58.840102 22490 net.cpp:165] Memory required for data: 1158880
+I0319 21:18:58.840121 22490 layer_factory.hpp:77] Creating layer ReLUFC2
+I0319 21:18:58.840131 22490 net.cpp:100] Creating Layer ReLUFC2
+I0319 21:18:58.840139 22490 net.cpp:434] ReLUFC2 <- FC2
+I0319 21:18:58.840150 22490 net.cpp:395] ReLUFC2 -> FC2 (in-place)
+I0319 21:18:58.840162 22490 net.cpp:150] Setting up ReLUFC2
+I0319 21:18:58.840171 22490 net.cpp:157] Top shape: 1 1024 (1024)
+I0319 21:18:58.840179 22490 net.cpp:165] Memory required for data: 1162976
+I0319 21:18:58.840186 22490 layer_factory.hpp:77] Creating layer DropoutFC2
+I0319 21:18:58.840196 22490 net.cpp:100] Creating Layer DropoutFC2
+I0319 21:18:58.840204 22490 net.cpp:434] DropoutFC2 <- FC2
+I0319 21:18:58.840214 22490 net.cpp:395] DropoutFC2 -> FC2 (in-place)
+I0319 21:18:58.840226 22490 net.cpp:150] Setting up DropoutFC2
+I0319 21:18:58.840235 22490 net.cpp:157] Top shape: 1 1024 (1024)
+I0319 21:18:58.840243 22490 net.cpp:165] Memory required for data: 1167072
+I0319 21:18:58.840258 22490 layer_factory.hpp:77] Creating layer DoF
+I0319 21:18:58.840273 22490 net.cpp:100] Creating Layer DoF
+I0319 21:18:58.840281 22490 net.cpp:434] DoF <- FC2
+I0319 21:18:58.840294 22490 net.cpp:408] DoF -> DoF
+I0319 21:18:58.840850 22490 net.cpp:150] Setting up DoF
+I0319 21:18:58.840870 22490 net.cpp:157] Top shape: 1 47 (47)
+I0319 21:18:58.840878 22490 net.cpp:165] Memory required for data: 1167260
+I0319 21:18:58.840889 22490 layer_factory.hpp:77] Creating layer DeepHandModel
+I0319 21:18:58.840924 22490 net.cpp:100] Creating Layer DeepHandModel
+I0319 21:18:58.840932 22490 net.cpp:434] DeepHandModel <- DoF
+I0319 21:18:58.840944 22490 net.cpp:408] DeepHandModel -> pred
+I0319 21:18:58.841106 22490 net.cpp:150] Setting up DeepHandModel
+I0319 21:18:58.841125 22490 net.cpp:157] Top shape: 1 93 (93)
+I0319 21:18:58.841132 22490 net.cpp:165] Memory required for data: 1167632
+I0319 21:18:58.841141 22490 net.cpp:228] DeepHandModel does not need backward computation.
+I0319 21:18:58.841150 22490 net.cpp:228] DoF does not need backward computation.
+I0319 21:18:58.841158 22490 net.cpp:228] DropoutFC2 does not need backward computation.
+I0319 21:18:58.841166 22490 net.cpp:228] ReLUFC2 does not need backward computation.
+I0319 21:18:58.841174 22490 net.cpp:228] FC2 does not need backward computation.
+I0319 21:18:58.841182 22490 net.cpp:228] DropoutFC1 does not need backward computation.
+I0319 21:18:58.841190 22490 net.cpp:228] ReLUFC1 does not need backward computation.
+I0319 21:18:58.841198 22490 net.cpp:228] FC1 does not need backward computation.
+I0319 21:18:58.841207 22490 net.cpp:228] ReLUconvL3 does not need backward computation.
+I0319 21:18:58.841213 22490 net.cpp:228] convL3 does not need backward computation.
+I0319 21:18:58.841222 22490 net.cpp:228] poolL2 does not need backward computation.
+I0319 21:18:58.841230 22490 net.cpp:228] ReLUconvL2 does not need backward computation.
+I0319 21:18:58.841238 22490 net.cpp:228] convL2 does not need backward computation.
+I0319 21:18:58.841246 22490 net.cpp:228] poolL1 does not need backward computation.
+I0319 21:18:58.841254 22490 net.cpp:228] ReLUconvL1 does not need backward computation.
+I0319 21:18:58.841262 22490 net.cpp:228] convL1 does not need backward computation.
+I0319 21:18:58.841270 22490 net.cpp:228] input does not need backward computation.
+I0319 21:18:58.841277 22490 net.cpp:270] This network produces output pred
+I0319 21:18:58.841300 22490 net.cpp:283] Network initialization done.
+I0319 21:18:58.862402 22490 net.cpp:761] Ignoring source layer data
+I0319 21:18:58.864780 22490 net.cpp:761] Ignoring source layer DeepHandModelxyzloss
+WSGI app 0 (mountpoint='/') ready in 1 seconds on interpreter 0x2433540 pid: 22490 (default app)
+*** uWSGI is running in multiple interpreter mode ***
+spawned uWSGI worker 1 (and the only) (pid: 22490, cores: 1)
+*** Starting uWSGI 2.0.14 (64bit) on [Wed Mar 22 16:40:18 2017] ***
+compiled with version: 4.8.4 on 27 October 2016 14:27:44
+os: Linux-4.2.0-27-generic #32~14.04.1-Ubuntu SMP Fri Jan 22 15:32:26 UTC 2016
+nodename: cbsr-wj-server
+machine: x86_64
+clock source: unix
+pcre jit disabled
+detected number of CPU cores: 12
+current working directory: /
+detected binary path: /usr/local/bin/uwsgi
+uWSGI running as root, you can use --uid/--gid/--chroot options
+*** WARNING: you are running uWSGI as root !!! (use the --uid flag) *** 
+chdir() to /data4/jiali/hand/testing/
+*** WARNING: you are running uWSGI without its master process manager ***
+your processes number limit is 256300
+your memory page size is 4096 bytes
+detected max file descriptor number: 1024
+lock engine: pthread robust mutexes
+thunder lock: disabled (you can enable it with --thunder-lock)
+uwsgi socket 0 bound to UNIX address /data4/jiali/hand/testing/handPose_recog.sock fd 3
+Python version: 2.7.6 (default, Jun 22 2015, 18:01:27)  [GCC 4.8.2]
+*** Python threads support is disabled. You can enable it with --enable-threads ***
+Python main interpreter initialized at 0xd3b810
+your server socket listen backlog is limited to 100 connections
+your mercy for graceful operations on workers is 60 seconds
+mapped 72768 bytes (71 KB) for 1 cores
+*** Operational MODE: single process ***
+mounting demo_server.py on /
+pycaffe_root ~/caffe/python/pycaffe
+
+NYU_path /data2/duanjiali/NYU/
+Traceback (most recent call last):
+  File "demo_server.py", line 25, in <module>
+    import caffe
+  File "/home/jlduan/caffe/python/caffe/__init__.py", line 1, in <module>
+    from .pycaffe import Net, SGDSolver, NesterovSolver, AdaGradSolver, RMSPropSolver, AdaDeltaSolver, AdamSolver
+  File "/home/jlduan/caffe/python/caffe/pycaffe.py", line 13, in <module>
+    from ._caffe import Net, SGDSolver, NesterovSolver, AdaGradSolver, \
+ImportError: libcudart.so.7.5: cannot open shared object file: No such file or directory
+*** Starting uWSGI 2.0.14 (64bit) on [Wed Mar 22 16:45:26 2017] ***
+compiled with version: 4.8.4 on 27 October 2016 14:27:44
+os: Linux-4.2.0-27-generic #32~14.04.1-Ubuntu SMP Fri Jan 22 15:32:26 UTC 2016
+nodename: cbsr-wj-server
+machine: x86_64
+clock source: unix
+pcre jit disabled
+detected number of CPU cores: 12
+current working directory: /
+detected binary path: /usr/local/bin/uwsgi
+uWSGI running as root, you can use --uid/--gid/--chroot options
+*** WARNING: you are running uWSGI as root !!! (use the --uid flag) *** 
+chdir() to /data4/jiali/hand/testing/
+*** WARNING: you are running uWSGI without its master process manager ***
+your processes number limit is 256300
+your memory page size is 4096 bytes
+detected max file descriptor number: 1024
+lock engine: pthread robust mutexes
+thunder lock: disabled (you can enable it with --thunder-lock)
+uwsgi socket 0 bound to UNIX address /data4/jiali/hand/testing/handPose_recog.sock fd 3
+Python version: 2.7.6 (default, Jun 22 2015, 18:01:27)  [GCC 4.8.2]
+*** Python threads support is disabled. You can enable it with --enable-threads ***
+Python main interpreter initialized at 0x1b94810
+your server socket listen backlog is limited to 100 connections
+your mercy for graceful operations on workers is 60 seconds
+mapped 72768 bytes (71 KB) for 1 cores
+*** Operational MODE: single process ***
+mounting demo_server.py on /
+pycaffe_root ~/caffe/python/pycaffe
+
+NYU_path /data2/duanjiali/NYU/
+Traceback (most recent call last):
+  File "demo_server.py", line 25, in <module>
+    import caffe
+  File "/home/jlduan/caffe/python/caffe/__init__.py", line 1, in <module>
+    from .pycaffe import Net, SGDSolver, NesterovSolver, AdaGradSolver, RMSPropSolver, AdaDeltaSolver, AdamSolver
+  File "/home/jlduan/caffe/python/caffe/pycaffe.py", line 13, in <module>
+    from ._caffe import Net, SGDSolver, NesterovSolver, AdaGradSolver, \
+ImportError: libcudart.so.7.5: cannot open shared object file: No such file or directory
+*** Starting uWSGI 2.0.14 (64bit) on [Wed Mar 22 16:55:59 2017] ***
+compiled with version: 4.8.4 on 27 October 2016 14:27:44
+os: Linux-4.2.0-27-generic #32~14.04.1-Ubuntu SMP Fri Jan 22 15:32:26 UTC 2016
+nodename: cbsr-wj-server
+machine: x86_64
+clock source: unix
+pcre jit disabled
+detected number of CPU cores: 12
+current working directory: /
+detected binary path: /usr/local/bin/uwsgi
+uWSGI running as root, you can use --uid/--gid/--chroot options
+*** WARNING: you are running uWSGI as root !!! (use the --uid flag) *** 
+chdir() to /data4/jiali/hand/testing/
+*** WARNING: you are running uWSGI without its master process manager ***
+your processes number limit is 256300
+your memory page size is 4096 bytes
+detected max file descriptor number: 1024
+lock engine: pthread robust mutexes
+thunder lock: disabled (you can enable it with --thunder-lock)
+uwsgi socket 0 bound to UNIX address /data4/jiali/hand/testing/handPose_recog.sock fd 3
+Python version: 2.7.6 (default, Jun 22 2015, 18:01:27)  [GCC 4.8.2]
+*** Python threads support is disabled. You can enable it with --enable-threads ***
+Python main interpreter initialized at 0x9e1810
+your server socket listen backlog is limited to 100 connections
+your mercy for graceful operations on workers is 60 seconds
+mapped 72768 bytes (71 KB) for 1 cores
+*** Operational MODE: single process ***
+mounting demo_server.py on /
+pycaffe_root ~/caffe/python/pycaffe
+
+NYU_path /data2/duanjiali/NYU/
+Traceback (most recent call last):
+  File "demo_server.py", line 25, in <module>
+    import caffe
+  File "/home/jlduan/caffe/python/caffe/__init__.py", line 1, in <module>
+    from .pycaffe import Net, SGDSolver, NesterovSolver, AdaGradSolver, RMSPropSolver, AdaDeltaSolver, AdamSolver
+  File "/home/jlduan/caffe/python/caffe/pycaffe.py", line 13, in <module>
+    from ._caffe import Net, SGDSolver, NesterovSolver, AdaGradSolver, \
+ImportError: libcudart.so.7.5: cannot open shared object file: No such file or directory
+*** Starting uWSGI 2.0.14 (64bit) on [Wed Mar 22 17:00:08 2017] ***
+compiled with version: 4.8.4 on 27 October 2016 14:27:44
+os: Linux-4.2.0-27-generic #32~14.04.1-Ubuntu SMP Fri Jan 22 15:32:26 UTC 2016
+nodename: cbsr-wj-server
+machine: x86_64
+clock source: unix
+pcre jit disabled
+detected number of CPU cores: 12
+current working directory: /
+detected binary path: /usr/local/bin/uwsgi
+uWSGI running as root, you can use --uid/--gid/--chroot options
+*** WARNING: you are running uWSGI as root !!! (use the --uid flag) *** 
+chdir() to /data4/jiali/hand/testing/
+*** WARNING: you are running uWSGI without its master process manager ***
+your processes number limit is 256300
+your memory page size is 4096 bytes
+detected max file descriptor number: 1024
+lock engine: pthread robust mutexes
+thunder lock: disabled (you can enable it with --thunder-lock)
+uwsgi socket 0 bound to UNIX address /data4/jiali/hand/testing/handPose_recog.sock fd 3
+Python version: 2.7.6 (default, Jun 22 2015, 18:01:27)  [GCC 4.8.2]
+*** Python threads support is disabled. You can enable it with --enable-threads ***
+Python main interpreter initialized at 0x1849810
+your server socket listen backlog is limited to 100 connections
+your mercy for graceful operations on workers is 60 seconds
+mapped 72768 bytes (71 KB) for 1 cores
+*** Operational MODE: single process ***
+mounting demo_server.py on /
+pycaffe_root ~/caffe/python/pycaffe
+
+NYU_path /data2/duanjiali/NYU/
+Traceback (most recent call last):
+  File "demo_server.py", line 25, in <module>
+    import caffe
+  File "/home/jlduan/caffe/python/caffe/__init__.py", line 1, in <module>
+    from .pycaffe import Net, SGDSolver, NesterovSolver, AdaGradSolver, RMSPropSolver, AdaDeltaSolver, AdamSolver
+  File "/home/jlduan/caffe/python/caffe/pycaffe.py", line 13, in <module>
+    from ._caffe import Net, SGDSolver, NesterovSolver, AdaGradSolver, \
+ImportError: libcudart.so.7.5: cannot open shared object file: No such file or directory
+*** Starting uWSGI 2.0.14 (64bit) on [Wed Mar 22 17:09:10 2017] ***
+compiled with version: 4.8.4 on 27 October 2016 14:27:44
+os: Linux-4.2.0-27-generic #32~14.04.1-Ubuntu SMP Fri Jan 22 15:32:26 UTC 2016
+nodename: cbsr-wj-server
+machine: x86_64
+clock source: unix
+pcre jit disabled
+detected number of CPU cores: 12
+current working directory: /
+detected binary path: /usr/local/bin/uwsgi
+uWSGI running as root, you can use --uid/--gid/--chroot options
+*** WARNING: you are running uWSGI as root !!! (use the --uid flag) *** 
+chdir() to /data4/jiali/hand/testing/
+*** WARNING: you are running uWSGI without its master process manager ***
+your processes number limit is 256301
+your memory page size is 4096 bytes
+detected max file descriptor number: 1024
+lock engine: pthread robust mutexes
+thunder lock: disabled (you can enable it with --thunder-lock)
+uwsgi socket 0 bound to UNIX address /data4/jiali/hand/testing/handPose_recog.sock fd 3
+Python version: 2.7.6 (default, Jun 22 2015, 18:01:27)  [GCC 4.8.2]
+*** Python threads support is disabled. You can enable it with --enable-threads ***
+Python main interpreter initialized at 0x25b6810
+your server socket listen backlog is limited to 100 connections
+your mercy for graceful operations on workers is 60 seconds
+mapped 72768 bytes (71 KB) for 1 cores
+*** Operational MODE: single process ***
+mounting demo_server.py on /
+pycaffe_root ~/caffe/python/pycaffe
+
+NYU_path /data2/duanjiali/NYU/
+Traceback (most recent call last):
+  File "demo_server.py", line 25, in <module>
+    import caffe
+  File "/home/jlduan/caffe/python/caffe/__init__.py", line 1, in <module>
+    from .pycaffe import Net, SGDSolver, NesterovSolver, AdaGradSolver, RMSPropSolver, AdaDeltaSolver, AdamSolver
+  File "/home/jlduan/caffe/python/caffe/pycaffe.py", line 13, in <module>
+    from ._caffe import Net, SGDSolver, NesterovSolver, AdaGradSolver, \
+ImportError: libcudart.so.7.5: cannot open shared object file: No such file or directory
+*** Starting uWSGI 2.0.14 (64bit) on [Wed Mar 22 17:15:38 2017] ***
+compiled with version: 4.8.4 on 27 October 2016 14:27:44
+os: Linux-4.2.0-27-generic #32~14.04.1-Ubuntu SMP Fri Jan 22 15:32:26 UTC 2016
+nodename: cbsr-wj-server
+machine: x86_64
+clock source: unix
+pcre jit disabled
+detected number of CPU cores: 12
+current working directory: /
+detected binary path: /usr/local/bin/uwsgi
+uWSGI running as root, you can use --uid/--gid/--chroot options
+*** WARNING: you are running uWSGI as root !!! (use the --uid flag) *** 
+chdir() to /data4/jiali/hand/testing/
+*** WARNING: you are running uWSGI without its master process manager ***
+your processes number limit is 256300
+your memory page size is 4096 bytes
+detected max file descriptor number: 1024
+lock engine: pthread robust mutexes
+thunder lock: disabled (you can enable it with --thunder-lock)
+uwsgi socket 0 bound to UNIX address /data4/jiali/hand/testing/handPose_recog.sock fd 3
+Python version: 2.7.6 (default, Jun 22 2015, 18:01:27)  [GCC 4.8.2]
+*** Python threads support is disabled. You can enable it with --enable-threads ***
+Python main interpreter initialized at 0x1e3f810
+your server socket listen backlog is limited to 100 connections
+your mercy for graceful operations on workers is 60 seconds
+mapped 72768 bytes (71 KB) for 1 cores
+*** Operational MODE: single process ***
+mounting demo_server.py on /
+pycaffe_root ~/caffe/python/pycaffe
+
+NYU_path /data2/duanjiali/NYU/
+Traceback (most recent call last):
+  File "demo_server.py", line 25, in <module>
+    import caffe
+  File "/home/jlduan/caffe/python/caffe/__init__.py", line 1, in <module>
+    from .pycaffe import Net, SGDSolver, NesterovSolver, AdaGradSolver, RMSPropSolver, AdaDeltaSolver, AdamSolver
+  File "/home/jlduan/caffe/python/caffe/pycaffe.py", line 13, in <module>
+    from ._caffe import Net, SGDSolver, NesterovSolver, AdaGradSolver, \
+ImportError: libcudart.so.7.5: cannot open shared object file: No such file or directory
